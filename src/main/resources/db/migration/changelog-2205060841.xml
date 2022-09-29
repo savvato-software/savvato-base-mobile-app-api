@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+	<changeSet author="haxwell" id="v2022050601">
+		<createTable tableName="direction_enum" catalogName="voting_db" >
+			<column name="id" type="BIGINT(20)" autoIncrement="true">
+				<constraints nullable="false" primaryKey="true"/>
+			</column>
+			<column name="description" type="VARCHAR(16)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+
+		<sql dbms="mysql">
+			INSERT INTO direction_enum (id, description) VALUES (1, 'FOR');
+			INSERT INTO direction_enum (id, description) VALUES (2, 'AGAINST');
+		</sql>
+	</changeSet>
+
+	<changeSet author="haxwell" id="v2022050602">
+		<createTable tableName="vote" catalogName="voting_db" >
+			<column name="user_id" type="BIGINT(20)">
+				<constraints nullable="false" foreignKeyName="vote_fk1" references="user(id)"/>
+			</column>
+			<column name="topic_id" type="BIGINT(20)">
+				<constraints nullable="false" foreignKeyName="vote_fk2" references="topic(id)"/>
+			</column>
+			<column name="direction" type="BIGINT(20)">
+				<constraints nullable="false" />
+			</column>
+            <column name="created" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP">
+            	<constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP">
+            	<constraints nullable="false"/>
+            </column>
+		</createTable>
+    </changeSet>
+
+</databaseChangeLog>
+

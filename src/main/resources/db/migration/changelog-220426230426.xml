@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+	<changeSet author="savvato-spring-boot-schematics" id="vDATE-1">
+		<createTable tableName="topic" catalogName="voting_db" >
+			<column name="id" type="BIGINT(20)" autoIncrement="true">
+				<constraints nullable="false" primaryKey="true"/>
+			</column>
+			<column name="user_id" type="BIGINT(20)">
+                <constraints nullable="false" foreignKeyName="topic_fk1" references="user(id)"/>
+			</column>
+			<column name="name" type="VARCHAR(128)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="description" type="VARCHAR(4096)">
+				<constraints nullable="false"/>
+			</column>
+            <column name="created" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP">
+            	<constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP">
+            	<constraints nullable="false"/>
+            </column>
+		</createTable>
+    </changeSet>
+
+	<changeSet author="savvato-spring-boot-schematics" id="vDATE-2" context="test">
+		<sql dbms="mysql">
+			insert into topic (id, user_id, name, description, created, last_updated) values (1, 1, "Make Dogs The Natl Animal", "Literally everybody loves dogs, so this would be good for national morale.", NOW() - INTERVAL 1 DAY, NOW() - INTERVAL 1 DAY);
+			insert into topic (id, user_id, name, description, created, last_updated) values (2, 1, "Bitcoin should become US legal tender.", "Bitcoin is for the people!", NOW() - INTERVAL 1 DAY, NOW() - INTERVAL 1 DAY);
+			insert into topic (id, user_id, name, description, created, last_updated) values (3, 1, "Lets just forget Jan 6", "Why you bringin' up old sh!+?", NOW() - INTERVAL 1 DAY, NOW() - INTERVAL 1 DAY);
+		</sql>
+	</changeSet>
+	<changeSet author="savvato-spring-boot-schematics" id="vDATE-3" context="test">
+		<sql dbms="mysql">
+			insert into topic (id, user_id, name, description, created, last_updated) values (4, 2, "National holiday voting", "More people will be able to vote.", NOW() - INTERVAL 1 DAY, NOW() - INTERVAL 1 DAY);
+			insert into topic (id, user_id, name, description, created, last_updated) values (5, 2, "Deep Space 9 was better than STTNG", "A storyline beats bite size episodes all day.", NOW() - INTERVAL 1 DAY, NOW() - INTERVAL 1 DAY);
+			insert into topic (id, user_id, name, description, created, last_updated) values (6, 2, "Recognize CSW as Satoshi", "It's obvious right? Give the man his props.", NOW() - INTERVAL 1 DAY, NOW() - INTERVAL 1 DAY);
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
+
