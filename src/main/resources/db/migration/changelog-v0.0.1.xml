@@ -6,7 +6,7 @@
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
 	<changeSet author="haxwell" id="v0.0.1-1">
-		<createTable tableName="user" catalogName="voting_db" >
+		<createTable tableName="user" catalogName="basemobileapp_db" >
 			<column name="id" type="BIGINT(20)" autoIncrement="true">
 				<constraints nullable="false" primaryKey="true"/>			
 			</column>
@@ -31,7 +31,7 @@
 					"admin",
 					"3035551212",
 					"admin@votingapp.com",
-					"$2a$10$wGcNuV0Kodg7uz6qI/l/1uz1mMcpmAGZqfuZ3JxY9cAeejtYXUbWC",
+					"$2a$10$wGcNuV0Kodg7uz6qI/l/1uz1mMcpmAGZqfuZ3JxY9cAeejtYXUbWC", <!-- pw = admin -->
 					1);
 		</sql>
 		<sql dbms="mysql">
@@ -40,13 +40,13 @@
             	"testuser",
             	"3035551213",
             	"testuser@votingapp.com",
-            	"$2a$10$wGcNuV0Kodg7uz6qI/l/1uz1mMcpmAGZqfuZ3JxY9cAeejtYXUbWC",
+            	"$2a$10$wGcNuV0Kodg7uz6qI/l/1uz1mMcpmAGZqfuZ3JxY9cAeejtYXUbWC", <!-- pw = admin -->
             	1);
         </sql>
     </changeSet>
 
 	<changeSet author="haxwell" id="v0.0.1-2">
-		<createTable tableName="user_role" catalogName="voting_db" >
+		<createTable tableName="user_role" catalogName="basemobileapp_db" >
 			<column name="id" type="BIGINT(20)" autoIncrement="true">
 				<constraints nullable="false" primaryKey="true"/>			
 			</column>
@@ -62,7 +62,7 @@
     </changeSet>
 
 	<changeSet author="haxwell" id="v0.0.1-3">
-		<createTable tableName="user_user_role_map" catalogName="voting_db" >
+		<createTable tableName="user_user_role_map" catalogName="basemobileapp_db" >
 			<column name="user_id" type="BIGINT(20)">
                 <constraints nullable="false" foreignKeyName="user_user_role_map_fk1" references="user(id)"/>			
 			</column>

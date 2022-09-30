@@ -8,15 +8,19 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @EnableWebMvc
 @Configuration
-@ComponentScan({"org.haxwell.votingapp.*"})
+@ComponentScan({"com.savvato.basemobileapp.*"})
 public class DatasourceConfig {
+
+	// CREATE DATABASE basemobileapp_db;
+	// CREATE USER 'basemobileapp_db_user'@'localhost' IDENTIFIED BY 'supersecure';
+	// GRANT ALL PRIVILEGES on basemobileapp_db.* TO 'basemobileapp_db_user'@'localhost';
 
 	@Bean(name = "dataSource")
 	public DriverManagerDataSource dataSource() {
 	    DriverManagerDataSource driverManagerDataSource = new DriverManagerDataSource();
 	    driverManagerDataSource.setDriverClassName("com.mysql.jdbc.Driver");
-	    driverManagerDataSource.setUrl("jdbc:mysql://localhost:3306/voting_db?verifyServerCertificate=false&useSSL=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC");
-	    driverManagerDataSource.setUsername("springuser_voting");
+	    driverManagerDataSource.setUrl("jdbc:mysql://localhost:3306/basemobileapp_db?verifyServerCertificate=false&useSSL=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC");
+	    driverManagerDataSource.setUsername("basemobileapp_db_user");
 	    driverManagerDataSource.setPassword("supersecure");
 	    return driverManagerDataSource;
 	}
