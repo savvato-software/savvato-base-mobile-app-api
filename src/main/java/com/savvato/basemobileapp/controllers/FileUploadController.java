@@ -91,7 +91,6 @@ public class FileUploadController {
 	}
 
 	private boolean isValidResourceType(String resourceType) {
-		return (resourceType.equals(ResourceTypeConstants.RESOURCE_TYPE_TOPIC_IMAGE)
-				|| resourceType.equals(ResourceTypeConstants.RESOURCE_TYPE_PROFILE_IMAGE));
+		return resourceType.equals(ResourceTypeConstants.RESOURCE_TYPE_PROFILE_IMAGE);
 	}
 }
