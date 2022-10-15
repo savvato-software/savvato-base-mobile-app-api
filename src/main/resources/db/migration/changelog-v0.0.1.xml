@@ -23,6 +23,13 @@
 			</column>
 			<column name="enabled" type="TINYINT(1)">
 			</column>
+			<column name="created" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP">
+				<constraints nullable="false"/>
+			</column>
+			<column name="last_updated" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP">
+				<constraints nullable="false"/>
+			</column>
+
 		</createTable>
 
 		<sql dbms="mysql">
@@ -30,7 +37,7 @@
 			VALUES (1,
 					"admin",
 					"3035551212",
-					"admin@votingapp.com",
+					"admin@app.com",
 					"$2a$10$wGcNuV0Kodg7uz6qI/l/1uz1mMcpmAGZqfuZ3JxY9cAeejtYXUbWC", <!-- pw = admin -->
 					1);
 		</sql>
@@ -39,7 +46,7 @@
             VALUES (2,
             	"testuser",
             	"3035551213",
-            	"testuser@votingapp.com",
+            	"testuser@app.com",
             	"$2a$10$wGcNuV0Kodg7uz6qI/l/1uz1mMcpmAGZqfuZ3JxY9cAeejtYXUbWC", <!-- pw = admin -->
             	1);
         </sql>

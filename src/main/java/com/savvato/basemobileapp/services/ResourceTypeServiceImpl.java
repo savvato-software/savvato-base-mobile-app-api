@@ -15,8 +15,6 @@ public class ResourceTypeServiceImpl implements ResourceTypeService {
 
         if (resourceType.equals(ResourceTypeConstants.RESOURCE_TYPE_PROFILE_IMAGE)) {
             rtn = resourcesDirRoot + "/profile";
-        } else if (resourceType.equals(ResourceTypeConstants.RESOURCE_TYPE_TOPIC_IMAGE)) {
-            rtn = resourcesDirRoot + "/topic";
         } else {
             throw new IllegalArgumentException("ResourceTypeService was passed an invalid resource type.");
         }
