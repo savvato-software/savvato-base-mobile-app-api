@@ -24,7 +24,11 @@ public class SMSChallengeCodeAPIController {
 
     @RequestMapping(value = { "/api/public/sendSMSChallengeCodeToPhoneNumber" }, method=RequestMethod.POST)
     public String sendSMSChallengeCode(@RequestBody @Valid SMSChallengeRequest req) {
-        String phoneNumber = "1" + req.phoneNumber;  // assume the number we're getting is 10 digits, without the country code
+        String phoneNumber = req.phoneNumber;  // assume the number we're getting is 10 digits, without the country code
+
+        if (!phoneNumber.startsWith("0"))
+            phoneNumber = "1" + phoneNumber;
+
         String rtn = smsccs.sendSMSChallengeCodeToPhoneNumber(phoneNumber);
         logger.debug("Sent challenge code to " + phoneNumber + ". " + rtn);
         return rtn;
@@ -39,20 +43,12 @@ public class SMSChallengeCodeAPIController {
 
     @RequestMapping(value = { "/api/public/isAValidSMSChallengeCode" }, method=RequestMethod.POST)
     public boolean isAValidSMSChallengeCode(@RequestBody @Valid SMSChallengeRequest req) {
-        String phoneNumberParam = req.phoneNumber;
 
-        if (phoneNumberParam.startsWith("0")) {
-            return true; // this is a test phone number, used in end-to-end testing
-        }
-
-        String phoneNumber = "1" + phoneNumberParam;  // assume the number we're getting is 10 digits, without the country code
-        String code = req.code;
-
-        if ((phoneNumberParam == null || phoneNumberParam.equals("null")) || (code == null || code.equals("null"))) {
+        if ((req.phoneNumber == null || req.phoneNumber.equals("null")) || (req.code == null || req.code.equals("null"))) {
             throw new IllegalArgumentException("Cannot check for valid SMS challenge code with null phoneNumber or challenge code.");
         }
 
-        return smsccs.isAValidSMSChallengeCode(phoneNumber, code);
+        return smsccs.isAValidSMSChallengeCode(req.phoneNumber, req.code);
     }
 
 }
