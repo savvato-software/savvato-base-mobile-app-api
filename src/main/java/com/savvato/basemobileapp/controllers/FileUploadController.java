@@ -1,7 +1,7 @@
 package com.savvato.basemobileapp.controllers;
 
 import com.savvato.basemobileapp.constants.ResourceTypeConstants;
-import com.savvato.basemobileapp.dto.GenericMessageDTO;
+import com.savvato.basemobileapp.dto.GenericResponseDTO;
 import com.savvato.basemobileapp.services.PictureService;
 import com.savvato.basemobileapp.services.StorageService;
 import org.apache.commons.logging.Log;
@@ -69,10 +69,10 @@ public class FileUploadController {
 	}
 
 	@RequestMapping(value = { "/api/resource/{resourceType}/{resourceId}" }, method = RequestMethod.POST)
-	public GenericMessageDTO handleFileUpload(HttpServletRequest request, @PathVariable String resourceType,
-											  @PathVariable String resourceId, @RequestParam("file") MultipartFile file) {
+	public GenericResponseDTO handleFileUpload(HttpServletRequest request, @PathVariable String resourceType,
+											   @PathVariable String resourceId, @RequestParam("file") MultipartFile file) {
 
-		GenericMessageDTO genericMessageDTO = GenericMessageDTO.builder().build();
+		GenericResponseDTO genericResponseDTO = GenericResponseDTO.builder().build();
 
 		if (isValidResourceType(resourceType)) {
 			String filename = storageService.getDefaultFilename(resourceType, resourceId);
@@ -82,11 +82,11 @@ public class FileUploadController {
 			try {
 				logger.debug("^^^^ About to call pictureservice to write thumbnail --> " + filename);
 				pictureService.writeThumbnailFromOriginal(resourceType, filename);
-				genericMessageDTO.responseMessage = "ok";
+				genericResponseDTO.responseMessage = "ok";
 			} catch (IOException ioe){
-				genericMessageDTO.responseMessage = "error";
+				genericResponseDTO.responseMessage = "error";
 			} finally {
-				return genericMessageDTO;
+				return genericResponseDTO;
 			}
 
 		}

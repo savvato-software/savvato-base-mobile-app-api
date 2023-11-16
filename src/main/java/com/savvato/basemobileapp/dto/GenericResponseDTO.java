@@ -3,7 +3,7 @@ package com.savvato.basemobileapp.dto;
 import lombok.Builder;
 
 @Builder
-public class GenericMessageDTO {
+public class GenericResponseDTO {
 
     public String responseMessage;
     
