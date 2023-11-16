@@ -82,9 +82,9 @@ public class FileUploadController {
 			try {
 				logger.debug("^^^^ About to call pictureservice to write thumbnail --> " + filename);
 				pictureService.writeThumbnailFromOriginal(resourceType, filename);
-				genericMessageDTO.responseMessage = "{\"msg\":\"ok\"}";
+				genericMessageDTO.responseMessage = "ok";
 			} catch (IOException ioe){
-				genericMessageDTO.responseMessage = "{\"msg\":\"error\"}";
+				genericMessageDTO.responseMessage = "error";
 			} finally {
 				return genericMessageDTO;
 			}
