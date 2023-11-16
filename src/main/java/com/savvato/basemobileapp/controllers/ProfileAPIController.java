@@ -1,6 +1,7 @@
 package com.savvato.basemobileapp.controllers;
 
 import com.savvato.basemobileapp.controllers.dto.ProfileRequest;
+import com.savvato.basemobileapp.dto.GenericResponseDTO;
 import com.savvato.basemobileapp.dto.ProfileDTO;
 import com.savvato.basemobileapp.services.ProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,13 +34,16 @@ public class ProfileAPIController {
 	}
 	
 	@RequestMapping(value = { "/api/profile/{profileId}" }, method=RequestMethod.PUT)
-	public ResponseEntity<Boolean> update(@RequestBody @Valid ProfileRequest request) {
-		boolean rtn = profileService.update(request.userId, request.name, request.email, request.phone);
+	public ResponseEntity<GenericResponseDTO> update(@RequestBody @Valid ProfileRequest request) {
+
+		GenericResponseDTO genericResponseDTO = GenericResponseDTO.builder().build();
+
+		genericResponseDTO.responseBoolean = profileService.update(request.userId, request.name, request.email, request.phone);
 		
-		if (rtn) {
-			return ResponseEntity.status(HttpStatus.OK).body(rtn);
+		if (genericResponseDTO.responseBoolean) {
+			return ResponseEntity.status(HttpStatus.OK).body(genericResponseDTO);
 		} else {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(rtn);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(genericResponseDTO);
 		}
 	}
 }
