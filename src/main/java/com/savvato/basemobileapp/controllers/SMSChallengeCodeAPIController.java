@@ -1,10 +1,13 @@
 package com.savvato.basemobileapp.controllers;
 
+import com.savvato.basemobileapp.dto.GenericResponseDTO;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import com.savvato.basemobileapp.controllers.dto.SMSChallengeRequest;
 import com.savvato.basemobileapp.services.SMSChallengeCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,15 +26,15 @@ public class SMSChallengeCodeAPIController {
     SMSChallengeCodeService smsccs;
 
     @RequestMapping(value = { "/api/public/sendSMSChallengeCodeToPhoneNumber" }, method=RequestMethod.POST)
-    public String sendSMSChallengeCode(@RequestBody @Valid SMSChallengeRequest req) {
+    public ResponseEntity<GenericResponseDTO> sendSMSChallengeCode(@RequestBody @Valid SMSChallengeRequest req) {
         String phoneNumber = req.phoneNumber;  // assume the number we're getting is 10 digits, without the country code
 
         if (!phoneNumber.startsWith("0"))
             phoneNumber = "1" + phoneNumber;
 
-        String rtn = smsccs.sendSMSChallengeCodeToPhoneNumber(phoneNumber);
-        logger.debug("Sent challenge code to " + phoneNumber + ". " + rtn);
-        return rtn;
+        GenericResponseDTO genericResponseDTO = GenericResponseDTO.builder().responseMessage(smsccs.sendSMSChallengeCodeToPhoneNumber(phoneNumber)).build();
+        logger.debug("Sent challenge code to " + phoneNumber + ". " + genericResponseDTO.responseMessage);
+        return ResponseEntity.status(HttpStatus.OK).body(genericResponseDTO);
     }
 
     @RequestMapping(value = { "/api/public/clearSMSChallengeCodeToPhoneNumber" }, method=RequestMethod.POST)
