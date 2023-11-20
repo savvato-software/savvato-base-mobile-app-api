@@ -38,10 +38,11 @@ public class SMSChallengeCodeAPIController {
     }
 
     @RequestMapping(value = { "/api/public/clearSMSChallengeCodeToPhoneNumber" }, method=RequestMethod.POST)
-    public String clearSMSChallengeCode(HttpServletRequest request, Model model) {
+    public ResponseEntity<GenericResponseDTO> clearSMSChallengeCode(HttpServletRequest request, Model model) {
         String phoneNumber = "1" + request.getParameter("phoneNumber");  // assume the number we're getting is 10 digits, without the country code
         smsccs.clearSMSChallengeCodeToPhoneNumber(phoneNumber);
-        return "ok";
+        GenericResponseDTO genericResponseDTO = GenericResponseDTO.builder().responseMessage("ok").build();
+        return ResponseEntity.status(HttpStatus.OK).body(genericResponseDTO);
     }
 
     @RequestMapping(value = { "/api/public/isAValidSMSChallengeCode" }, method=RequestMethod.POST)
