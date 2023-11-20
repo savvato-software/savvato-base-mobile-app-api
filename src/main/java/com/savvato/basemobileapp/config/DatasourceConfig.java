@@ -12,15 +12,15 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 public class DatasourceConfig {
 
 	// CREATE DATABASE basemobileapp_db;
-	// CREATE USER 'basemobileapp_db_user'@'localhost' IDENTIFIED BY 'supersecure';
-	// GRANT ALL PRIVILEGES on basemobileapp_db.* TO 'basemobileapp_db_user'@'localhost';
+	// CREATE USER 'basemobileappdbuser'@'localhost' IDENTIFIED BY 'supersecure';
+	// GRANT ALL PRIVILEGES on basemobileapp_db.* TO 'basemobileappdbuser'@'localhost';
 
 	@Bean(name = "dataSource")
 	public DriverManagerDataSource dataSource() {
 	    DriverManagerDataSource driverManagerDataSource = new DriverManagerDataSource();
 	    driverManagerDataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
 	    driverManagerDataSource.setUrl("jdbc:mysql://localhost:3306/basemobileapp_db?verifyServerCertificate=false&useSSL=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC");
-	    driverManagerDataSource.setUsername("basemobileapp_db_user");
+	    driverManagerDataSource.setUsername("basemobileappdbuser");
 	    driverManagerDataSource.setPassword("supersecure");
 	    return driverManagerDataSource;
 	}
