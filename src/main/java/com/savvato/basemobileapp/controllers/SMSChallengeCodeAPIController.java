@@ -46,13 +46,13 @@ public class SMSChallengeCodeAPIController {
     }
 
     @RequestMapping(value = { "/api/public/isAValidSMSChallengeCode" }, method=RequestMethod.POST)
-    public boolean isAValidSMSChallengeCode(@RequestBody @Valid SMSChallengeRequest req) {
+    public ResponseEntity<GenericResponseDTO> isAValidSMSChallengeCode(@RequestBody @Valid SMSChallengeRequest req) {
 
         if ((req.phoneNumber == null || req.phoneNumber.equals("null")) || (req.code == null || req.code.equals("null"))) {
             throw new IllegalArgumentException("Cannot check for valid SMS challenge code with null phoneNumber or challenge code.");
         }
-
-        return smsccs.isAValidSMSChallengeCode(req.phoneNumber, req.code);
+        GenericResponseDTO genericResponseDTO = GenericResponseDTO.builder().responseBoolean(smsccs.isAValidSMSChallengeCode(req.phoneNumber, req.code)).build();
+        return ResponseEntity.status(HttpStatus.OK).body(genericResponseDTO);
     }
 
 }
