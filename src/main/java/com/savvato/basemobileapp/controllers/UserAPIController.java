@@ -21,6 +21,8 @@ import java.util.Optional;
 @RestController
 public class UserAPIController {
 
+	private enum userData {USER_NAME, USER_EMAIL, USER_PHONE};
+
 	@Autowired
 	UserService userService;
 
@@ -57,7 +59,7 @@ public class UserAPIController {
 	// api/public/user/isUsernameAvailable?q=sample
 	@RequestMapping(value = { "/api/public/user/isUsernameAvailable" })
 	public boolean isUsernameAvailable(@RequestParam("q") String queryStr) {
-		return this.ur.findByName(queryStr).isPresent() == false;
+		return this.isUserDataAvailable(userData.USER_NAME, queryStr);
 	}
 
 	// api/public/user/isPhoneNumberAvailable?q=7205870001
@@ -80,11 +82,21 @@ public class UserAPIController {
 	// api/public/user/isUserInformationUnique?name=sample&phone=7205870001&email=anAddress@domain.com
 	@RequestMapping(value = { "/api/public/user/isUserInformationUnique" })
 	public String isUserInformationUnique(@RequestParam("name") String username, @RequestParam("phone") String phone, @RequestParam("email") String email) {
-		if (!isUsernameAvailable(username)) return "{\"response\": \"username\"}";
+		if (!isUserDataAvailable(userData.USER_NAME,username)) return "{\"response\": \"username\"}";
 		if (!isPhoneNumberAvailable(phone)) return "{\"response\": \"phone\"}";
 		if (!isEmailAddressAvailable(email)) return "{\"response\": \"email\"}";
 
 		return "{\"response\": true}";
+	}
+
+	private boolean isUserDataAvailable(userData typeOfData, String data){
+		boolean rtn = switch(typeOfData) {
+			case USER_NAME -> ur.findByName(data).isPresent() == false;
+			case USER_EMAIL -> ur.findByEmail(data).isPresent() == false;
+			case USER_PHONE -> ur.findByPhone(data).isEmpty();
+		};
+
+		return rtn;
 	}
 
 	@RequestMapping(value = { "/api/public/user/changeLostPassword" }, method=RequestMethod.POST)
