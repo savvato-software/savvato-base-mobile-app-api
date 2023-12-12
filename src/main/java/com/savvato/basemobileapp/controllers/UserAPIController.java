@@ -5,6 +5,7 @@ import javax.validation.Valid;
 import com.savvato.basemobileapp.constants.Constants;
 import com.savvato.basemobileapp.controllers.dto.LostPasswordRequest;
 import com.savvato.basemobileapp.controllers.dto.UserRequest;
+import com.savvato.basemobileapp.dto.GenericResponseDTO;
 import com.savvato.basemobileapp.entities.User;
 import com.savvato.basemobileapp.repositories.UserRepository;
 import com.savvato.basemobileapp.services.ProfileService;
@@ -81,18 +82,24 @@ public class UserAPIController {
 
 	// api/public/user/isUserInformationUnique?name=sample&phone=7205870001&email=anAddress@domain.com
 	@RequestMapping(value = { "/api/public/user/isUserInformationUnique" })
-	public String isUserInformationUnique(@RequestParam("name") String username, @RequestParam("phone") String phone, @RequestParam("email") String email) {
-		if (!isUserDataAvailable(UserData.USER_NAME,username)) return "{\"response\": \"username\"}";
-		if (!isPhoneNumberAvailable(phone)) return "{\"response\": \"phone\"}";
-		if (!isEmailAddressAvailable(email)) return "{\"response\": \"email\"}";
-
-		return "{\"response\": true}";
+	public ResponseEntity<GenericResponseDTO> isUserInformationUnique(@RequestParam("name") String username, @RequestParam("phone") String phone, @RequestParam("email") String email) {
+		GenericResponseDTO genericResponseDTO = GenericResponseDTO.builder().build();
+		if (!isUserDataAvailable(UserData.USER_NAME,username)) {
+			genericResponseDTO.responseMessage = "username";
+		} else if (!isUserDataAvailable(UserData.USER_PHONE,phone)) {
+			genericResponseDTO.responseMessage = "phone number";
+		} else if (!isUserDataAvailable(UserData.USER_EMAIL,email)) {
+			genericResponseDTO.responseMessage = "email";
+		} else {
+			genericResponseDTO.responseMessage = "true";
+		}
+		return ResponseEntity.status(HttpStatus.OK).body(genericResponseDTO);
 	}
 
 	private boolean isUserDataAvailable(UserData typeOfData, String data){
 		boolean rtn = switch(typeOfData) {
-			case USER_NAME -> ur.findByName(data).isPresent() == false;
-			case USER_EMAIL -> ur.findByEmail(data).isPresent() == false;
+			case USER_NAME -> ur.findByName(data).isEmpty();
+			case USER_EMAIL -> ur.findByEmail(data).isEmpty();
 			case USER_PHONE -> ur.findByPhone(data).isEmpty();
 		};
 
