@@ -1,22 +1,20 @@
 package com.savvato.basemobileapp.utils;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ValidationUtil {
-	
-	private static final Log logger = LogFactory.getLog(ValidationUtil.class);
 
 	public static boolean isPhoneValid(String str) {
 		
-		logger.warn("ValidationUtil::isPhoneValid()    NEEDS    TO    BE     IMPLEMENTED    !!!");
+		log.warn("ValidationUtil::isPhoneValid()    NEEDS    TO    BE     IMPLEMENTED    !!!");
 		
 		return str != null;
 	}
 	
 	public static boolean isEmailValid(String str) {
 		
-		logger.warn("ValidationUtil::isEmailValid()    NEEDS    TO    BE     IMPLEMENTED    !!!");
+		log.warn("ValidationUtil::isEmailValid()    NEEDS    TO    BE     IMPLEMENTED    !!!");
 		
 		return str != null;
 	}
