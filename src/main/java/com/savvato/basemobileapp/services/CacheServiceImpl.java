@@ -1,7 +1,6 @@
 package com.savvato.basemobileapp.services;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
@@ -14,15 +13,14 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
 public class CacheServiceImpl implements CacheService {
 
-	private static final Log logger = LogFactory.getLog(CacheServiceImpl.class);
-	
 	HashMap<String, Cache<String, String>> mapCacheNameToCacheOfStringKtoStringV = new HashMap<>();
 	
 	public CacheServiceImpl() {
-		logger.debug("Just created instance of CacheServiceImpl");
+		log.debug("Just created instance of CacheServiceImpl");
 	}
 	
 	public void put(String cacheName, String key, String value) {
@@ -46,7 +44,7 @@ public class CacheServiceImpl implements CacheService {
 			return mapCacheNameToCacheOfStringKtoStringV.get(cacheName);
 		}
 		
-		logger.debug("Cache " + cacheName + " was not found in the CacheService. Creating a new instance.");
+		log.debug("Cache " + cacheName + " was not found in the CacheService. Creating a new instance.");
 		
 		CacheManager cm = CacheManagerBuilder.newCacheManagerBuilder()
 				.withCache(cacheName,  CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class, ResourcePoolsBuilder.heap(10))

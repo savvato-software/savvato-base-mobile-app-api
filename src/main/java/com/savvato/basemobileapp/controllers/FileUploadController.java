@@ -4,8 +4,7 @@ import com.savvato.basemobileapp.constants.ResourceTypeConstants;
 import com.savvato.basemobileapp.dto.GenericResponseDTO;
 import com.savvato.basemobileapp.services.PictureService;
 import com.savvato.basemobileapp.services.StorageService;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +14,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
+@Slf4j
 @RestController
 public class FileUploadController {
-
-	private static final Log logger = LogFactory.getLog(FileUploadController.class);
 
 	private final StorageService storageService;
 	private final PictureService pictureService;
@@ -61,10 +59,10 @@ public class FileUploadController {
 		String filename = storageService.getDefaultFilename(resourceType, resourceId);
 		filename = pictureService.transformFilenameUsingSizeInfo(photoSize, filename);
 
-		logger.debug("^^^^^ About to call storageservice to load --> " + filename);
+		log.debug("^^^^^ About to call storageservice to load --> " + filename);
 		byte[] fileAsByteArray = storageService.loadAsByteArray(resourceType, filename);
 
-		logger.debug("^^^^^^ Back from storageservice call to load --> " + filename);
+		log.debug("^^^^^^ Back from storageservice call to load --> " + filename);
 		return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(fileAsByteArray);
 	}
 
@@ -76,11 +74,11 @@ public class FileUploadController {
 
 		if (isValidResourceType(resourceType)) {
 			String filename = storageService.getDefaultFilename(resourceType, resourceId);
-			logger.debug("^^^^ About to call storage service to save --> " + filename);
+			log.debug("^^^^ About to call storage service to save --> " + filename);
 			storageService.store(resourceType, file, filename);
 
 			try {
-				logger.debug("^^^^ About to call pictureservice to write thumbnail --> " + filename);
+				log.debug("^^^^ About to call pictureservice to write thumbnail --> " + filename);
 				pictureService.writeThumbnailFromOriginal(resourceType, filename);
 				genericResponseDTO.responseMessage = "ok";
 			} catch (IOException ioe){
@@ -91,7 +89,7 @@ public class FileUploadController {
 
 		}
 
-		logger.debug("^^^^^ COULD NOT do the HandleFileUpload!");
+		log.debug("^^^^^ COULD NOT do the HandleFileUpload!");
 		return null;
 	}
 

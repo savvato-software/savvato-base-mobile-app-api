@@ -17,11 +17,11 @@ public class DatasourceConfig {
 
 	@Bean(name = "dataSource")
 	public DriverManagerDataSource dataSource() {
-	    DriverManagerDataSource driverManagerDataSource = new DriverManagerDataSource();
-	    driverManagerDataSource.setDriverClassName("com.mysql.jdbc.Driver");
-	    driverManagerDataSource.setUrl("jdbc:mysql://localhost:3306/basemobileapp_db?verifyServerCertificate=false&useSSL=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC");
-	    driverManagerDataSource.setUsername("basemobileappdbuser");
-	    driverManagerDataSource.setPassword("supersecure");
-	    return driverManagerDataSource;
+        DriverManagerDataSource driverManagerDataSource = new DriverManagerDataSource();
+        driverManagerDataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        driverManagerDataSource.setUrl("jdbc:mysql://localhost:3306/basemobileapp_db?verifyServerCertificate=false&useSSL=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC");
+        driverManagerDataSource.setUsername("basemobileappdbuser");
+        driverManagerDataSource.setPassword("supersecure");
+        return driverManagerDataSource;
 	}
 }
