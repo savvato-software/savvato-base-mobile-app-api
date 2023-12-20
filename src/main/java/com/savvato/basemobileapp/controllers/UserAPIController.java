@@ -100,7 +100,7 @@ public class UserAPIController {
 		boolean rtn = switch(typeOfData) {
 			case USER_NAME -> ur.findByName(data).isEmpty();
 			case USER_EMAIL -> ur.findByEmail(data).isEmpty();
-			case USER_PHONE -> ur.findByPhone(data).isEmpty();
+			case USER_PHONE -> ur.findByPhone(data).get().isEmpty();
 		};
 
 		return rtn;
