@@ -45,7 +45,7 @@ public class FileUploadController {
 	}
 
 	@RequestMapping(value = { "/api/resource/{resourceType}/{resourceId}" }, method = RequestMethod.DELETE)
-	public boolean deleteFile(HttpServletRequest request, @PathVariable String resourceType,
+	public ResponseEntity<GenericResponseDTO> deleteFile(HttpServletRequest request, @PathVariable String resourceType,
 			@PathVariable String resourceId) {
 		boolean b = false;
 
@@ -53,8 +53,11 @@ public class FileUploadController {
 			String filename = storageService.getDefaultFilename(resourceType, resourceId);
 			b = storageService.delete(resourceType, filename);
 		}
-
-		return b;
+		GenericResponseDTO genericResponseDTO = GenericResponseDTO
+				.builder()
+				.responseBoolean(b)
+				.build();
+		return ResponseEntity.status(HttpStatus.OK).body(genericResponseDTO);
 	}
 
 	@RequestMapping(value = { "/api/resource/{resourceType}/{resourceId}" }, method = RequestMethod.GET)
