@@ -6,6 +6,7 @@ import com.savvato.basemobileapp.services.PictureService;
 import com.savvato.basemobileapp.services.StorageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +29,7 @@ public class FileUploadController {
 	}
 
 	@RequestMapping(value = { "/api/resource/{resourceType}/{resourceId}/isFound" }, method = RequestMethod.GET)
-	public long fileIsFound(HttpServletRequest request, @PathVariable String resourceType,
+	public ResponseEntity<GenericResponseDTO> fileIsFound(HttpServletRequest request, @PathVariable String resourceType,
 			@PathVariable String resourceId) {
 		long timestamp = 0;
 
@@ -36,8 +37,11 @@ public class FileUploadController {
 			String filename = storageService.getDefaultFilename(resourceType, resourceId);
 			timestamp = storageService.isFileExisting(resourceType, filename);
 		}
-
-		return timestamp;
+		GenericResponseDTO genericResponseDTO = GenericResponseDTO
+				.builder()
+				.responseLong(timestamp)
+				.build();
+		return ResponseEntity.status(HttpStatus.OK).body(genericResponseDTO);
 	}
 
 	@RequestMapping(value = { "/api/resource/{resourceType}/{resourceId}" }, method = RequestMethod.DELETE)
