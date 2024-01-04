@@ -74,7 +74,7 @@ public class FileUploadController {
 	}
 
 	@RequestMapping(value = { "/api/resource/{resourceType}/{resourceId}" }, method = RequestMethod.POST)
-	public GenericResponseDTO handleFileUpload(HttpServletRequest request, @PathVariable String resourceType,
+	public ResponseEntity<GenericResponseDTO> handleFileUpload(HttpServletRequest request, @PathVariable String resourceType,
 											   @PathVariable String resourceId, @RequestParam("file") MultipartFile file) {
 
 		GenericResponseDTO genericResponseDTO = GenericResponseDTO.builder().build();
@@ -91,7 +91,7 @@ public class FileUploadController {
 			} catch (IOException ioe){
 				genericResponseDTO.responseMessage = "error";
 			} finally {
-				return genericResponseDTO;
+				return ResponseEntity.status(HttpStatus.OK).body(genericResponseDTO);
 			}
 
 		}
