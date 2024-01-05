@@ -36,7 +36,8 @@ public class ProfileAPIController {
 	@RequestMapping(value = { "/api/profile/{profileId}" }, method=RequestMethod.PUT)
 	public ResponseEntity<GenericResponseDTO> update(@RequestBody @Valid ProfileRequest request) {
 
-		GenericResponseDTO genericResponseDTO = GenericResponseDTO.builder()
+		GenericResponseDTO genericResponseDTO = GenericResponseDTO
+				.builder()
 				.responseBoolean(profileService.update(request.userId, request.name, request.email, request.phone))
 				.build();
 		
