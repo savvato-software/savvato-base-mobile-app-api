@@ -79,25 +79,30 @@ public class FileUploadController {
 
 		GenericResponseDTO genericResponseDTO = GenericResponseDTO.builder().build();
 
-		if (isValidResourceType(resourceType)) {
+		if (!isValidResourceType(resourceType)) {
+			// Return a 400 Bad Request if the resource type is invalid
+			log.debug("^^^^^ COULD NOT do the HandleFileUpload!");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+		}
+
+		try {
 			String filename = storageService.getDefaultFilename(resourceType, resourceId);
 			log.debug("^^^^ About to call storage service to save --> " + filename);
 			storageService.store(resourceType, file, filename);
 
-			try {
-				log.debug("^^^^ About to call pictureservice to write thumbnail --> " + filename);
-				pictureService.writeThumbnailFromOriginal(resourceType, filename);
-				genericResponseDTO.responseMessage = "ok";
-			} catch (IOException ioe){
-				genericResponseDTO.responseMessage = "error";
-			} finally {
-				return ResponseEntity.status(HttpStatus.OK).body(genericResponseDTO);
-			}
+			log.debug("^^^^ About to call pictureservice to write thumbnail --> " + filename);
+			pictureService.writeThumbnailFromOriginal(resourceType, filename);
+			genericResponseDTO.responseMessage = "ok";
 
+			// Return success response with 200 OK
+			return ResponseEntity.status(HttpStatus.OK).body(genericResponseDTO);
+
+		} catch (IOException ioe){
+			// Handle IO exceptions and return a 500 Internal Server Error
+			genericResponseDTO.responseMessage = "error";
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(genericResponseDTO);
 		}
 
-		log.debug("^^^^^ COULD NOT do the HandleFileUpload!");
-		return null;
 	}
 
 	private boolean isValidResourceType(String resourceType) {
