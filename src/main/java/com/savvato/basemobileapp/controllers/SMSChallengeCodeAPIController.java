@@ -30,7 +30,10 @@ public class SMSChallengeCodeAPIController {
         if (!phoneNumber.startsWith("0"))
             phoneNumber = "1" + phoneNumber;
 
-        GenericResponseDTO genericResponseDTO = GenericResponseDTO.builder().responseMessage(smsccs.sendSMSChallengeCodeToPhoneNumber(phoneNumber)).build();
+        GenericResponseDTO genericResponseDTO = GenericResponseDTO
+                .builder()
+                .responseMessage(smsccs.sendSMSChallengeCodeToPhoneNumber(phoneNumber))
+                .build();
         log.debug("Sent challenge code to " + phoneNumber + ". " + genericResponseDTO.responseMessage);
         return ResponseEntity.status(HttpStatus.OK).body(genericResponseDTO);
     }
