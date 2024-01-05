@@ -51,35 +51,7 @@ public class UserAPIController {
 			return new ResponseEntity(iae.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
-
-
-	// TODO: figure a way to have these enddpoints not be publicly accessible, but also not require a user to be logged in.
-	// 			a secret, but general purpose for-the-app login.
-
-
-	// api/public/user/isUsernameAvailable?q=sample
-	@RequestMapping(value = { "/api/public/user/isUsernameAvailable" })
-	public boolean isUsernameAvailable(@RequestParam("q") String queryStr) {
-		return this.isUserDataAvailable(UserData.USER_NAME, queryStr);
-	}
-
-	// api/public/user/isPhoneNumberAvailable?q=7205870001
-	@RequestMapping(value = { "/api/public/user/isPhoneNumberAvailable" })
-	public boolean isPhoneNumberAvailable(@RequestParam("q") String queryStr) {
-		Optional<List<User>> opt = this.ur.findByPhone(queryStr);
-
-		if (opt.isPresent())
-			return opt.get().size() == 0;
-		else
-			return true;
-	}
-
-	// api/public/user/isEmailAddressAvailable?q=anAddress@domain.com
-	@RequestMapping(value = { "/api/public/user/isEmailAddressAvailable" })
-	public boolean isEmailAddressAvailable(@RequestParam("q") String queryStr) {
-		return this.ur.findByEmail(queryStr).isPresent() == false;
-	}
-
+	
 	// api/public/user/isUserInformationUnique?name=sample&phone=7205870001&email=anAddress@domain.com
 	@RequestMapping(value = { "/api/public/user/isUserInformationUnique" })
 	public ResponseEntity<GenericResponseDTO> isUserInformationUnique(@RequestParam("name") String username, @RequestParam("phone") String phone, @RequestParam("email") String email) {
