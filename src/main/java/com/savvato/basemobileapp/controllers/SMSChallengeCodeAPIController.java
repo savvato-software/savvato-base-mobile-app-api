@@ -42,7 +42,10 @@ public class SMSChallengeCodeAPIController {
     public ResponseEntity<GenericResponseDTO> clearSMSChallengeCode(HttpServletRequest request, Model model) {
         String phoneNumber = "1" + request.getParameter("phoneNumber");  // assume the number we're getting is 10 digits, without the country code
         smsccs.clearSMSChallengeCodeToPhoneNumber(phoneNumber);
-        GenericResponseDTO genericResponseDTO = GenericResponseDTO.builder().responseMessage("ok").build();
+        GenericResponseDTO genericResponseDTO = GenericResponseDTO
+                .builder()
+                .responseMessage("ok")
+                .build();
         return ResponseEntity.status(HttpStatus.OK).body(genericResponseDTO);
     }
 
