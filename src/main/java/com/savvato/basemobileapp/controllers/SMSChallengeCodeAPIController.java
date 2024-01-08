@@ -55,9 +55,10 @@ public class SMSChallengeCodeAPIController {
         if ((req.phoneNumber == null || req.phoneNumber.equals("null")) || (req.code == null || req.code.equals("null"))) {
             throw new IllegalArgumentException("Cannot check for valid SMS challenge code with null phoneNumber or challenge code.");
         }
+        Boolean isValidCode = smsccs.isAValidSMSChallengeCode(req.phoneNumber, req.code);
         GenericResponseDTO genericResponseDTO = GenericResponseDTO
                 .builder()
-                .responseBoolean(smsccs.isAValidSMSChallengeCode(req.phoneNumber, req.code))
+                .responseBoolean(isValidCode)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(genericResponseDTO);
     }
