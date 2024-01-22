@@ -26,6 +26,8 @@ public class SMSTextMessageServiceImpl implements SMSTextMessageService {
 
 		if (toPhoneNumber.startsWith("0")) {
 			rtn = true; 	// for use in testing. just act like we did it.
+
+			log.debug("PRETENDED to send SMS to " + toPhoneNumber + " /  msg: [" + msg + "]");
 		} else {
 			try {
 				log.debug(SMS_API_AUTH_ID);

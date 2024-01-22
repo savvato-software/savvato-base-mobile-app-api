@@ -1,10 +1,12 @@
 package com.savvato.basemobileapp.controllers;
 
 import com.savvato.basemobileapp.constants.ResourceTypeConstants;
+import com.savvato.basemobileapp.dto.GenericResponseDTO;
 import com.savvato.basemobileapp.services.PictureService;
 import com.savvato.basemobileapp.services.StorageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +29,7 @@ public class FileUploadController {
 	}
 
 	@RequestMapping(value = { "/api/resource/{resourceType}/{resourceId}/isFound" }, method = RequestMethod.GET)
-	public long fileIsFound(HttpServletRequest request, @PathVariable String resourceType,
+	public ResponseEntity<GenericResponseDTO> fileIsFound(HttpServletRequest request, @PathVariable String resourceType,
 			@PathVariable String resourceId) {
 		long timestamp = 0;
 
@@ -35,12 +37,15 @@ public class FileUploadController {
 			String filename = storageService.getDefaultFilename(resourceType, resourceId);
 			timestamp = storageService.isFileExisting(resourceType, filename);
 		}
-
-		return timestamp;
+		GenericResponseDTO genericResponseDTO = GenericResponseDTO
+				.builder()
+				.responseLong(timestamp)
+				.build();
+		return ResponseEntity.status(HttpStatus.OK).body(genericResponseDTO);
 	}
 
 	@RequestMapping(value = { "/api/resource/{resourceType}/{resourceId}" }, method = RequestMethod.DELETE)
-	public boolean deleteFile(HttpServletRequest request, @PathVariable String resourceType,
+	public ResponseEntity<GenericResponseDTO> deleteFile(HttpServletRequest request, @PathVariable String resourceType,
 			@PathVariable String resourceId) {
 		boolean b = false;
 
@@ -48,8 +53,11 @@ public class FileUploadController {
 			String filename = storageService.getDefaultFilename(resourceType, resourceId);
 			b = storageService.delete(resourceType, filename);
 		}
-
-		return b;
+		GenericResponseDTO genericResponseDTO = GenericResponseDTO
+				.builder()
+				.responseBoolean(b)
+				.build();
+		return ResponseEntity.status(HttpStatus.OK).body(genericResponseDTO);
 	}
 
 	@RequestMapping(value = { "/api/resource/{resourceType}/{resourceId}" }, method = RequestMethod.GET)
@@ -66,26 +74,35 @@ public class FileUploadController {
 	}
 
 	@RequestMapping(value = { "/api/resource/{resourceType}/{resourceId}" }, method = RequestMethod.POST)
-	public String handleFileUpload(HttpServletRequest request, @PathVariable String resourceType,
-			@PathVariable String resourceId, @RequestParam("file") MultipartFile file) {
+	public ResponseEntity<GenericResponseDTO> handleFileUpload(HttpServletRequest request, @PathVariable String resourceType,
+											   @PathVariable String resourceId, @RequestParam("file") MultipartFile file) {
 
-		if (isValidResourceType(resourceType)) {
+		GenericResponseDTO genericResponseDTO = GenericResponseDTO.builder().build();
+
+		if (!isValidResourceType(resourceType)) {
+			// Return a 400 Bad Request if the resource type is invalid
+			log.debug("^^^^^ COULD NOT do the HandleFileUpload!");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+		}
+
+		try {
 			String filename = storageService.getDefaultFilename(resourceType, resourceId);
 			log.debug("^^^^ About to call storage service to save --> " + filename);
 			storageService.store(resourceType, file, filename);
 
-			try {
-				log.debug("^^^^ About to call pictureservice to write thumbnail --> " + filename);
-				pictureService.writeThumbnailFromOriginal(resourceType, filename);
-			} catch (IOException ioe){
-				return "{\"msg\":\"error\"}";
-			}
+			log.debug("^^^^ About to call pictureservice to write thumbnail --> " + filename);
+			pictureService.writeThumbnailFromOriginal(resourceType, filename);
+			genericResponseDTO.responseMessage = "ok";
 
-			return "{\"msg\":\"ok\"}";
+			// Return success response with 200 OK
+			return ResponseEntity.status(HttpStatus.OK).body(genericResponseDTO);
+
+		} catch (IOException ioe){
+			// Handle IO exceptions and return a 500 Internal Server Error
+			genericResponseDTO.responseMessage = "error";
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(genericResponseDTO);
 		}
 
-		log.debug("^^^^^ COULD NOT do the HandleFileUpload!");
-		return null;
 	}
 
 	private boolean isValidResourceType(String resourceType) {

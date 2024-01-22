@@ -5,6 +5,7 @@ import javax.validation.Valid;
 import com.savvato.basemobileapp.constants.Constants;
 import com.savvato.basemobileapp.controllers.dto.LostPasswordRequest;
 import com.savvato.basemobileapp.controllers.dto.UserRequest;
+import com.savvato.basemobileapp.dto.GenericResponseDTO;
 import com.savvato.basemobileapp.entities.User;
 import com.savvato.basemobileapp.repositories.UserRepository;
 import com.savvato.basemobileapp.services.ProfileService;
@@ -20,6 +21,8 @@ import java.util.Optional;
 
 @RestController
 public class UserAPIController {
+
+	private enum UserData {USER_NAME, USER_EMAIL, USER_PHONE};
 
 	@Autowired
 	UserService userService;
@@ -48,43 +51,31 @@ public class UserAPIController {
 			return new ResponseEntity(iae.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
-
-
-	// TODO: figure a way to have these enddpoints not be publicly accessible, but also not require a user to be logged in.
-	// 			a secret, but general purpose for-the-app login.
-
-
-	// api/public/user/isUsernameAvailable?q=sample
-	@RequestMapping(value = { "/api/public/user/isUsernameAvailable" })
-	public boolean isUsernameAvailable(@RequestParam("q") String queryStr) {
-		return this.ur.findByName(queryStr).isPresent() == false;
-	}
-
-	// api/public/user/isPhoneNumberAvailable?q=7205870001
-	@RequestMapping(value = { "/api/public/user/isPhoneNumberAvailable" })
-	public boolean isPhoneNumberAvailable(@RequestParam("q") String queryStr) {
-		Optional<List<User>> opt = this.ur.findByPhone(queryStr);
-
-		if (opt.isPresent())
-			return opt.get().size() == 0;
-		else
-			return true;
-	}
-
-	// api/public/user/isEmailAddressAvailable?q=anAddress@domain.com
-	@RequestMapping(value = { "/api/public/user/isEmailAddressAvailable" })
-	public boolean isEmailAddressAvailable(@RequestParam("q") String queryStr) {
-		return this.ur.findByEmail(queryStr).isPresent() == false;
-	}
-
+	
 	// api/public/user/isUserInformationUnique?name=sample&phone=7205870001&email=anAddress@domain.com
 	@RequestMapping(value = { "/api/public/user/isUserInformationUnique" })
-	public String isUserInformationUnique(@RequestParam("name") String username, @RequestParam("phone") String phone, @RequestParam("email") String email) {
-		if (!isUsernameAvailable(username)) return "{\"response\": \"username\"}";
-		if (!isPhoneNumberAvailable(phone)) return "{\"response\": \"phone\"}";
-		if (!isEmailAddressAvailable(email)) return "{\"response\": \"email\"}";
+	public ResponseEntity<GenericResponseDTO> isUserInformationUnique(@RequestParam("name") String username, @RequestParam("phone") String phone, @RequestParam("email") String email) {
+		GenericResponseDTO genericResponseDTO = GenericResponseDTO.builder().build();
+		if (!isUserDataAvailable(UserData.USER_NAME,username)) {
+			genericResponseDTO.responseMessage = "username";
+		} else if (!isUserDataAvailable(UserData.USER_PHONE,phone)) {
+			genericResponseDTO.responseMessage = "phone number";
+		} else if (!isUserDataAvailable(UserData.USER_EMAIL,email)) {
+			genericResponseDTO.responseMessage = "email";
+		} else {
+			genericResponseDTO.responseMessage = "true";
+		}
+		return ResponseEntity.status(HttpStatus.OK).body(genericResponseDTO);
+	}
 
-		return "{\"response\": true}";
+	private boolean isUserDataAvailable(UserData typeOfData, String data){
+		boolean rtn = switch(typeOfData) {
+			case USER_NAME -> ur.findByName(data).isEmpty();
+			case USER_EMAIL -> ur.findByEmail(data).isEmpty();
+			case USER_PHONE -> ur.findByPhone(data).get().isEmpty();
+		};
+
+		return rtn;
 	}
 
 	@RequestMapping(value = { "/api/public/user/changeLostPassword" }, method=RequestMethod.POST)
