@@ -1,0 +1,14 @@
+[Unit]
+Description=baseApp Backend API
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/java -jar /opt/app/base-app-backend-api.jar
+StandardOutput=append:/opt/app/server.log
+StandardError=inherit
+WorkingDirectory=/opt/app
+User=ubuntu
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,166 @@
+---
+- hosts: all 
+  become: true
+  collections:
+    - community.crypto
+  vars:
+    ansible_python_interpreter: /usr/bin/python3  # Specify the path to Python 3 interpreter
+    mysql_database: baseapp_db # Set the desired name for the database
+    mysql_root_password: supersecure  # Set the desired root password for MySQL
+  tasks:
+    - name: Update package cache
+      apt:
+        update_cache: yes
+
+    - name: Upgrade packages
+      apt:
+        upgrade: yes
+        autoremove: yes
+        autoclean: yes
+        
+        # TODO: Add port 80 iptable rule
+
+    - name: Check if .p12 file exists with a pattern
+      ansible.builtin.find:
+        paths: "/usr/share"
+        patterns: "base-app-backend-api.staging.savvato.com.p12"
+      register: p12_files
+
+    - name: Do the .p12 (ssl cert) processing
+      block:
+        - name: sudo snap install certbot
+          ansible.builtin.shell: |
+            snap install --classic certbot
+        - name: create certbot symbolic link
+          ansible.builtin.shell: |
+            ln -s /snap/bin/certbot /usr/bin/certbot
+        - name: Generate Let's Encrypt Certificate with Certbot
+          ansible.builtin.shell: |
+            certbot certonly --non-interactive --standalone \
+            --agree-tos --email security@savvato.com \
+            -d base-app-backend-api.staging.savvato.com
+          args:
+            creates: /etc/letsencrypt/live/base-app-backend-api.staging.savvato.com/fullchain.pem
+          become: yes
+          register: certbot_result
+
+        - name: Convert to .p12 format
+          ansible.builtin.shell: |
+            openssl pkcs12 -export -inkey /etc/letsencrypt/live/base-app-backend-api.staging.savvato.com/privkey.pem -name tomcat -in /etc/letsencrypt/live/base-app-backend-api.staging.savvato.com/fullchain.pem -out /usr/share/base-app-backend-api.staging.savvato.com.p12 -password pass:supersecure!
+
+    # Make sure the aws_s3 module is correctly referenced; it might require installing a collection if not done already.
+        - name: Upload .p12 file to S3
+          aws_s3:
+            bucket: savvato-domain-certifications
+            object: /base-app-backend-api.staging.savvato.com.p12
+            src: /usr/share/base-app-backend-api.staging.savvato.com.p12
+            mode: put
+            permission: private
+      when: p12_files.matched == 0
+
+    - name: Pull Domain Certification file from S3
+      aws_s3:
+        bucket: savvato-domain-certifications
+        object: base-app-backend-api.staging.savvato.com.p12
+        dest: /usr/share/base-app-backend-api.staging.savvato.com.p12
+        mode: get
+
+    - name: Set Domain Certification file permissions
+      command: chmod 400 /usr/share/base-app-backend-api.staging.savvato.com.p12
+    - name: 
+      command: chown -R ubuntu:ubuntu /usr/share/base-app-backend-api.staging.savvato.com.p12
+
+    - name: Create database baseapp_db 
+      mysql_db:
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+        state: present
+        name: "{{ mysql_database }}"
+        login_user: root
+        login_password: "{{ mysql_root_password }}"
+
+    - name: Create user baseappdbuser
+      mysql_user:
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+        state: present
+        name: baseappdbuser
+        password: supersecure
+
+    - name: Grant privileges to baseappdbuser
+      mysql_user:
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+        state: present
+        name: baseappdbuser 
+        password: supersecure
+        priv: "*.*:ALL"
+        host: localhost
+        append_privs: yes
+
+    - name: Create /home/ubuntu/base-app/images
+      file:
+        path: /home/ubuntu/base-app/images
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'
+
+    - name: Create /opt/app directory if it doesn't exist
+      file:
+        path: /opt/app
+        state: directory
+      
+    - name: Wait for /opt/app directory to be created
+      wait_for:
+        path: /opt/app
+      
+    - name: Create application.properties file
+      file:
+        path: /opt/app/application.properties
+        state: touch
+
+    - name: Write to application.properties file
+      blockinfile:
+        path: /opt/app/application.properties
+        block: |
+          app.uploaded.user.resources.directory.root=/home/ubuntu/base-app/images
+          server.port=8443
+          server.ssl.keyAlias=tomcat
+          server.ssl.key-store=/usr/share/base-app-backend-api.staging.savvato.com.p12
+          server.ssl.key-store-password=
+          server.ssl.key-password=
+          spring.liquibase.change-log=classpath:/db/migration/changelog-master.xml
+          spring.servlet.multipart.max-file-size=11MB
+          spring.servlet.multipart.max-request-size=11MB
+          PLIVO_SMS_AUTH_ID=
+          PLIVO_SMS_AUTH_TOKEN=
+          googlemaps.api.key=
+          IS_PRODUCTION=false
+        
+    - name: chown the opt dir for ubuntu user
+      command: chown -R ubuntu:ubuntu /opt
+
+    - name: Pull JAR file from S3
+      aws_s3:
+        bucket: savvato-builds-bucket
+        object: savvato-base-app-backend-api.jar
+        dest: /opt/app/base-app-backend-api.jar
+        mode: get
+
+    - name: Copy systemd service file
+      become: true
+      copy:
+        src:  systemd.service
+        dest: /etc/systemd/system/base-app-backend-api.service
+
+    - name: Enable and start the service
+      become: true
+      systemd:
+        name: base-app-backend-api.service
+        state: started
+        enabled: yes
+        
+    - name: Reboot the machine
+      become: true
+      reboot:
+        msg: "Rebooting the machine"
+        pre_reboot_delay: 5 
+
