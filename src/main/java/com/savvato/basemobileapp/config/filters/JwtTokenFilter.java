@@ -3,6 +3,7 @@ package com.savvato.basemobileapp.config.filters;
 import java.io.IOException;
 import java.util.List;
 
+import io.jsonwebtoken.*;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +27,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
+
+import javax.crypto.SecretKey;
 
 @Slf4j
 @Component
@@ -70,13 +73,17 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         chain.doFilter(request, response);
     }
-    
-    // taken from: https://github.com/Yoh0xFF/java-spring-security-example/blob/master/src/main/java/io/example/configuration/security/JwtTokenUtil.java
+
     private boolean validate(String token) {
         try {
-            Jwts.parser().setSigningKey(Constants.JWT_SECRET).parseClaimsJws(token);
+            JwtParser parser = Jwts.parser()
+                    .verifyWith((SecretKey) Constants.JWT_SECRET_KEY) // Cast to SecretKey
+                    .build();
+
+            parser.parseSignedClaims(token); // Parses and verifies the JWT
+
             return true;
-        } catch (SignatureException ex) {
+        } catch (SecurityException | SignatureException ex) {
             log.error("Invalid JWT signature - " + ex.getMessage());
         } catch (MalformedJwtException ex) {
             log.error("Invalid JWT token - " + ex.getMessage());
@@ -89,14 +96,14 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         }
         return false;
     }
-    
-    // taken from: https://github.com/Yoh0xFF/java-spring-security-example/blob/master/src/main/java/io/example/configuration/security/JwtTokenUtil.java
+
     public String getEmailAddress(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(Constants.JWT_SECRET)
-                .parseClaimsJws(token)
-                .getBody();
+        JwtParser parser = Jwts.parser()
+                .verifyWith((SecretKey) Constants.JWT_SECRET_KEY) // Cast to SecretKey
+                .build();
+
+        Claims claims = parser.parseSignedClaims(token).getPayload();
 
         return claims.getSubject().split(",")[1];
-    }    
+    }
 }

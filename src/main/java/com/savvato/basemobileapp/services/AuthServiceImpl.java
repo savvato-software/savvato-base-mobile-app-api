@@ -17,7 +17,7 @@ public class AuthServiceImpl  {
                 .setIssuer(Constants.JWT_ISSUER)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000)) // 1 week
-                .signWith(SignatureAlgorithm.HS512, Constants.JWT_SECRET)
+                .signWith(SignatureAlgorithm.HS512, Constants.JWT_SECRET_KEY)
                 .compact();
     }
 }

@@ -1,10 +1,15 @@
 package com.savvato.basemobileapp.constants;
 
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+
+import java.security.Key;
+
 public class Constants {
 	public static final String SMS = "SMS";
 	public static final String EMAIL = "EMAIL";
-	
-	public static final String JWT_SECRET = "zdtlD3JK56m6wTTgsNFhqzjqP";
+
+	public static final Key JWT_SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 	public static final String JWT_ISSUER = "com.savvato";
 
 	public static final String PHOTO_SIZE_THUMBNAIL = "thumbnail";
